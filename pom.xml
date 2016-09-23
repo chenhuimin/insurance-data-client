@@ -11,8 +11,16 @@
         <httpclient.version>4.2.2</httpclient.version>
         <slf4j.version>1.5.11</slf4j.version>
         <log4j.version>1.2.16</log4j.version>
+        <imageServerClient.version>1.1.0-SNAPSHOT</imageServerClient.version>
     </properties>
     <dependencies>
+        <!-- 图片中心client -->
+        <dependency>
+            <groupId>com.lannto.it</groupId>
+            <artifactId>imageServerClient</artifactId>
+            <version>${imageServerClient.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
@@ -28,6 +36,11 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient-osgi</artifactId>
             <version>${httpclient.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
         </dependency>
         <!-- log -->
         <dependency>
@@ -63,6 +76,11 @@
             <artifactId>json-lib</artifactId>
             <classifier>jdk15</classifier>
             <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.9.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

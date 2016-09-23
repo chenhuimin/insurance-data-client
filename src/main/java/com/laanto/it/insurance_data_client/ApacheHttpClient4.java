@@ -46,43 +46,47 @@ public class ApacheHttpClient4 {
 
     public static DefaultHttpClient newInstance() {
         if (httpClient4 == null) {
-            PoolingClientConnectionManager cxMgr = new PoolingClientConnectionManager(SchemeRegistryFactory.createDefault());
-            cxMgr.setMaxTotal(CONNECTION_MAX_TOTAL);
-            cxMgr.setDefaultMaxPerRoute(CONNECTION_DEFAULT_MAX_PER_ROUTEL);
-            httpClient4 = new DefaultHttpClient(cxMgr);
-            try {
-                //Secure Protocol implementation.
-                SSLContext ctx = SSLContext.getInstance("SSL");
-                //Implementation of a trust manager for X509 certificates
-                X509TrustManager tm = new X509TrustManager() {
+            synchronized (ApacheHttpClient4.class) {
+                if (httpClient4 == null) {
+                    PoolingClientConnectionManager cxMgr = new PoolingClientConnectionManager(SchemeRegistryFactory.createDefault());
+                    cxMgr.setMaxTotal(CONNECTION_MAX_TOTAL);
+                    cxMgr.setDefaultMaxPerRoute(CONNECTION_DEFAULT_MAX_PER_ROUTEL);
+                    httpClient4 = new DefaultHttpClient(cxMgr);
+                    try {
+                        //Secure Protocol implementation.
+                        SSLContext ctx = SSLContext.getInstance("SSL");
+                        //Implementation of a trust manager for X509 certificates
+                        X509TrustManager tm = new X509TrustManager() {
 
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                            @Override
+                            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 
+                            }
+
+                            @Override
+                            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+                            }
+
+                            @Override
+                            public X509Certificate[] getAcceptedIssuers() {
+                                return new X509Certificate[]{};
+                            }
+
+                        };
+                        ctx.init(null, new TrustManager[]{tm}, null);
+                        SSLSocketFactory ssf = new SSLSocketFactory(ctx);
+                        ssf.setHostnameVerifier(new AllowAllHostnameVerifier());
+                        ClientConnectionManager ccm = httpClient4.getConnectionManager();
+                        //register https protocol in httpclient's scheme registry
+                        SchemeRegistry sr = ccm.getSchemeRegistry();
+                        sr.register(new Scheme("https", 443, ssf));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-
-                    }
-
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[]{};
-                    }
-
-                };
-                ctx.init(null, new TrustManager[]{tm}, null);
-                SSLSocketFactory ssf = new SSLSocketFactory(ctx);
-                ssf.setHostnameVerifier(new AllowAllHostnameVerifier());
-                ClientConnectionManager ccm = httpClient4.getConnectionManager();
-                //register https protocol in httpclient's scheme registry
-                SchemeRegistry sr = ccm.getSchemeRegistry();
-                sr.register(new Scheme("https", 443, ssf));
-            } catch (Exception e) {
-                e.printStackTrace();
+                    initializeHttpClient4(httpClient4);
+                }
             }
-            initializeHttpClient4(httpClient4);
         }
         return httpClient4;
     }
